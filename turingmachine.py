@@ -9,6 +9,42 @@ SLEEP_DELAY = 0.1
 
 MachineState = namedtuple('MachineState', ('number', 'read', 'write', 'move', 'next', ))
 
+DIAGRAM_ORIGINAL = """
+   +---+          +-------------------------+
+   |   |          |                         |
+   |   v          v                         |
+  +-----+      +-----+      +-----+      +-----+
+  |     |      |     |      |     |      |     |
+  |  0  |----->|  1  |----->|  2  |----->|  3  |
+  |     |      |     |      |     |      |     |
+  +-----+      +-----+      +-----+      +-----+
+                  |          |   ^        |   ^
+                  v          |   |        |   |
+               +-----+       +---+        +---+
+               |     |
+               |  4  |
+               |     |
+               +-----+
+"""
+
+DIAGRAM = """
+   +---+          +-------------------------+
+   |   |          |                         |
+   |   v          v                         |
+  +{b0h}+      +{b1h}+      +{b2h}+      +{b3h}+
+  {b0v}     {b0v}      {b1v}     {b1v}      {b2v}     {b2v}      {b3v}     {b3v}
+  {b0v}  0  {b0v}----->{b1v}  1  {b1v}----->{b2v}  2  {b2v}----->{b3v}  3  {b3v}
+  {b0v}     {b0v}      {b1v}     {b1v}      {b2v}     {b2v}      {b3v}     {b3v}
+  +{b0h}+      +{b1h}+      +{b2h}+      +{b3h}+
+                  |          |   ^        |   ^
+                  v          |   |        |   |
+               +{b4h}+       +---+        +---+
+               {b4v}     {b4v}
+               {b4v}  4  {b4v}
+               {b4v}     {b4v}
+               +{b4h}+
+"""
+
 
 class Tape:
     head_position = 0
@@ -153,7 +189,9 @@ class TuringMachine:
     def print_info(self, state):
         print('Computing {} x {}\n'.format(self.multiplier, self.multiplicand))
         state_info = 'Current State:\n Number: {}\n Read:   {}\n Write:  {}\n Move:   {}\n Next:   {}\n'
+        state_number = None
         if state:
+            state_number = state.number
             print(
                 state_info.format(
                     state.number,
@@ -167,6 +205,33 @@ class TuringMachine:
             print(state_info.format(*([''] * 5)))
 
         print('Step #{}\n'.format(self.get_steps()))
+
+        def h(own):
+            if own == state_number:
+                ch = '='
+            else:
+                ch = '-'
+            return ch * 5
+
+        def v(own):
+            if own == state_number:
+                ch = '‖'
+            else:
+                ch = '|'
+            return ch
+
+        print(DIAGRAM.format(
+            b0h=h(0),
+            b0v=v(0),
+            b1h=h(1),
+            b1v=v(1),
+            b2h=h(2),
+            b2v=v(2),
+            b3h=h(3),
+            b3v=v(3),
+            b4h=h(4),
+            b4v=v(4),
+        ))
 
         print(' ' * PRINT_PADDING * 2, 'R')
         for tape in self.tapes:
@@ -206,6 +271,8 @@ class TuringMachine:
                 halt = True
             if interactive:
                 input()
+
+        self.print_info(state)
 
         print(
             '\nComputing done: {} x {} = {} in {} steps.'.format(

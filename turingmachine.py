@@ -124,6 +124,13 @@ class TuringMachine:
             read='BBB',
             write='BBB',
             move='NNN',
+            next=4,
+        ),
+        MachineState(
+            number=4,
+            read='BBB',
+            write='BBB',
+            move='NNN',
             next=None,
         ),
         MachineState(
@@ -271,8 +278,6 @@ class TuringMachine:
                 halt = True
             if interactive:
                 input()
-
-        self.print_info(state)
 
         print(
             '\nComputing done: {} x {} = {} in {} steps.'.format(
